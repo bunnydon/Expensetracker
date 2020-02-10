@@ -40,13 +40,13 @@ class ExpensePage extends StatefulWidget {
 
 class _ExpensePageState extends State<ExpensePage> {
   List<Transaction> _userTransation = [
-    Transaction(
-        itemName: "Mobile", itemPrice: 120.50, itemDate: DateTime.now()),
-    Transaction(
-        itemName: "Jacket", itemPrice: 110.50, itemDate: DateTime.now()),
-    Transaction(itemName: "Watch", itemPrice: 130.50, itemDate: DateTime.now()),
 //    Transaction(
-//        itemName: "Kobe Jersey", itemPrice: 150.50, itemDate: DateTime.now()),
+//        itemName: "Mobile", itemPrice: 120.50, itemDate: DateTime.now()),
+//    Transaction(
+//        itemName: "Jacket", itemPrice: 110.50, itemDate: DateTime.now()),
+//    Transaction(itemName: "Watch", itemPrice: 130.50, itemDate: DateTime.now()),
+    Transaction(
+        itemName: "Kobe Jersey", itemPrice: 150.50, itemDate: DateTime.now()),
   ];
 
   List<Transaction> get _recentTransaction {
@@ -56,10 +56,23 @@ class _ExpensePageState extends State<ExpensePage> {
   }
 
   void _addNewTransaction(String txName, double txPrice, DateTime txDate) {
-    final NewTx =
-        Transaction(itemName: txName, itemPrice: txPrice, itemDate: txDate);
+    final NewTx = Transaction(
+        itemName: txName,
+        itemPrice: txPrice,
+        itemDate: txDate,
+        id: DateTime.now().toString());
     setState(() {
       _userTransation.add(NewTx);
+    });
+  }
+
+  //this function helps you delete the transacations
+
+  void _deleteTransactions(String id) {
+    setState(() {
+      _userTransation.removeWhere((tx) {
+        return tx.id == id;
+      });
     });
   }
 
@@ -96,7 +109,7 @@ class _ExpensePageState extends State<ExpensePage> {
         child: Column(
           children: <Widget>[
             Chart(_recentTransaction),
-            TransactionList(_userTransation),
+            TransactionList(_userTransation, _deleteTransactions),
           ],
         ),
       ),
