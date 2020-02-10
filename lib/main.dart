@@ -1,4 +1,7 @@
-import 'package:expense_tracker/transcation.dart';
+import 'package:expense_tracker/models/transcation.dart';
+import 'package:expense_tracker/widgets/chart.dart';
+import 'package:expense_tracker/widgets/new_transaction.dart';
+import 'package:expense_tracker/widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,24 +12,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.green,
-          splashColor: Colors.black45,
-          onPressed: () {},
-          child: Icon(
-            Icons.add,
-          ),
-        ),
-        appBar: AppBar(
-          backgroundColor: Colors.green,
-          title: Text(
-            "Expense tracker",
-          ),
-          centerTitle: true,
-        ),
-        body: ExpensePage(),
-      ),
+      debugShowCheckedModeBanner: false,
+      home: ExpensePage(),
+      theme: ThemeData(
+          primarySwatch: Colors.green,
+          fontFamily: "Quicksand",
+          textTheme: TextTheme(
+              title: TextStyle(
+            fontFamily: "Quicksand",
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          )),
+          appBarTheme: AppBarTheme(
+              textTheme: TextTheme(
+                  title: TextStyle(
+            fontFamily: "Lato",
+            fontSize: 20,
+          )))),
     );
   }
 }
@@ -37,131 +39,79 @@ class ExpensePage extends StatefulWidget {
 }
 
 class _ExpensePageState extends State<ExpensePage> {
-  List<Transaction> transaction = [
+  List<Transaction> _userTransation = [
     Transaction(
         itemName: "Mobile", itemPrice: 120.50, itemDate: DateTime.now()),
     Transaction(
         itemName: "Jacket", itemPrice: 110.50, itemDate: DateTime.now()),
     Transaction(itemName: "Watch", itemPrice: 130.50, itemDate: DateTime.now()),
+//    Transaction(
+//        itemName: "Kobe Jersey", itemPrice: 150.50, itemDate: DateTime.now()),
   ];
 
-  String itemName;
-  String itemprice;
+  List<Transaction> get _recentTransaction {
+    return _userTransation.where((tx) {
+      return tx.itemDate.isAfter(DateTime.now().subtract(Duration(days: 7)));
+    }).toList();
+  }
+
+  void _addNewTransaction(String txName, double txPrice, DateTime txDate) {
+    final NewTx =
+        Transaction(itemName: txName, itemPrice: txPrice, itemDate: txDate);
+    setState(() {
+      _userTransation.add(NewTx);
+    });
+  }
+
+  void _showAddTransaction(BuildContext bCtx) {
+    showModalBottomSheet(
+        context: bCtx,
+        builder: (ctx) {
+          return NewTransaction(_addNewTransaction);
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Container(
-          width: double.infinity,
-          child: Card(
-            child: Text(
-              "Expense Tracker Chart",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.blue,
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        title: Text(
+          "Expense Tracker",
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: Colors.white,
             ),
-            elevation: 5.0,
-          ),
+            onPressed: () {
+              _showAddTransaction(context);
+            },
+          )
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Chart(_recentTransaction),
+            TransactionList(_userTransation),
+          ],
         ),
-        Card(
-          elevation: 5,
-          child: Container(
-            padding: EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                TextField(
-                  onChanged: (Value) {
-                    itemName = Value;
-                  },
-                  cursorColor: Colors.green,
-                  decoration: InputDecoration(labelText: "Item Name"),
-                ),
-                TextField(
-                  onChanged: (val) {
-                    itemprice = (val);
-                  },
-                  cursorColor: Colors.green,
-                  decoration: InputDecoration(
-                    labelText: "Item Price",
-                  ),
-                ),
-                RaisedButton(
-                  onLongPress: () {
-                    setState(() {
-                      transaction.add(
-                        Transaction(
-                          itemPrice: double.parse(itemprice),
-                          itemName: itemName,
-                          itemDate: DateTime.now(),
-                        ),
-                      );
-                    });
-                  },
-                  child: Text(
-                    "Add Transactions",
-                    textAlign: TextAlign.center,
-                  ),
-                  textColor: Colors.black,
-                  onPressed: () {},
-                )
-              ],
-            ),
-          ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        splashColor: Colors.black,
+        backgroundColor: Colors.green,
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
         ),
-        Column(
-          children: transaction.map((tx) {
-            return Card(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    child: Text(
-                      '\$' + tx.itemPrice.toString(),
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 25.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.green,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(10.0)),
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                    padding: EdgeInsets.all(5.0),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        tx.itemName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20.0,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMEd().format(tx.itemDate),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15.0,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+        onPressed: () {
+          _showAddTransaction(context);
+        },
+      ),
     );
   }
 }
