@@ -3,9 +3,19 @@ import 'package:expense_tracker/widgets/chart.dart';
 import 'package:expense_tracker/widgets/new_transaction.dart';
 import 'package:expense_tracker/widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  // this method ensures only to use portrait mode
+
+//  WidgetsFlutterBinding.ensureInitialized();
+//  SystemChrome.setPreferredOrientations(
+//      [DeviceOrientation.portraitUp, DeviceOrientation.portraitUp]).then((_) {
+//    runApp(MyApp());
+//  });
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -45,9 +55,10 @@ class _ExpensePageState extends State<ExpensePage> {
 //    Transaction(
 //        itemName: "Jacket", itemPrice: 110.50, itemDate: DateTime.now()),
 //    Transaction(itemName: "Watch", itemPrice: 130.50, itemDate: DateTime.now()),
-    Transaction(
-        itemName: "Kobe Jersey", itemPrice: 150.50, itemDate: DateTime.now()),
+//    Transaction(
+//        itemName: "Kobe Jersey", itemPrice: 150.50, itemDate: DateTime.now()),
   ];
+  bool _showChart = false;
 
   List<Transaction> get _recentTransaction {
     return _userTransation.where((tx) {
@@ -86,30 +97,77 @@ class _ExpensePageState extends State<ExpensePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: Text(
-          "Expense Tracker",
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              _showAddTransaction(context);
-            },
-          )
-        ],
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final appBar = AppBar(
+      backgroundColor: Colors.green,
+      title: Text(
+        "Expense Tracker",
       ),
+      centerTitle: true,
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            _showAddTransaction(context);
+          },
+        )
+      ],
+    );
+
+    return Scaffold(
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Chart(_recentTransaction),
-            TransactionList(_userTransation, _deleteTransactions),
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text(
+                    "Show Chart",
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Switch(
+                      value: _showChart,
+                      onChanged: (value) {
+                        setState(() {
+                          _showChart = value;
+                        });
+                      })
+                ],
+              ),
+            if (!isLandscape)
+              Container(
+                  height: (MediaQuery.of(context).size.height * 0.3) -
+                      appBar.preferredSize.height -
+                      MediaQuery.of(context).padding.top,
+                  child: Chart(_recentTransaction)),
+            if (!isLandscape)
+              Container(
+                  height: (MediaQuery.of(context).size.height * 0.7) -
+                      appBar.preferredSize.height -
+                      MediaQuery.of(context).padding.top,
+                  child: TransactionList(_userTransation, _deleteTransactions)),
+            if (isLandscape)
+              _showChart
+                  ? Container(
+                      height: (MediaQuery.of(context).size.height * 0.7) -
+                          appBar.preferredSize.height -
+                          MediaQuery.of(context).padding.top,
+                      child: Chart(_recentTransaction))
+                  : Container(
+                      height: (MediaQuery.of(context).size.height * 0.7) -
+                          appBar.preferredSize.height -
+                          MediaQuery.of(context).padding.top,
+                      child: TransactionList(
+                          _userTransation, _deleteTransactions)),
           ],
         ),
       ),

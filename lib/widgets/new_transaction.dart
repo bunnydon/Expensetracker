@@ -41,68 +41,74 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            TextField(
-              cursorColor: Colors.green,
-              decoration: InputDecoration(labelText: "Item Name"),
-              controller: itemNameController,
-              onSubmitted: (_) {
-                submitData();
-              },
-            ),
-            TextField(
-              cursorColor: Colors.green,
-              decoration: InputDecoration(
-                labelText: "Item Price",
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Container(
+          padding: EdgeInsets.only(
+              left: 10,
+              top: 10,
+              right: 10,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              TextField(
+                cursorColor: Colors.green,
+                decoration: InputDecoration(labelText: "Item Name"),
+                controller: itemNameController,
+                onSubmitted: (_) {
+                  submitData();
+                },
               ),
-              controller: itemPriceController,
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    _selectedDateTime == null
-                        ? "NO DATE ENTERD"
-                        : "Picked Date : ${DateFormat.yMd().format(_selectedDateTime)}",
-                    style: Theme.of(context).textTheme.title.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                        ),
-                  ),
+              TextField(
+                cursorColor: Colors.green,
+                decoration: InputDecoration(
+                  labelText: "Item Price",
                 ),
-                FlatButton(
-                  child: Text(
-                    "Choose a date",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.bold,
+                controller: itemPriceController,
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      _selectedDateTime == null
+                          ? "NO DATE ENTERD"
+                          : "Picked Date : ${DateFormat.yMd().format(_selectedDateTime)}",
+                      style: Theme.of(context).textTheme.title.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                          ),
                     ),
                   ),
-                  onPressed: _pickDate,
-                )
-              ],
-            ),
-            RaisedButton(
-              color: Theme.of(context).accentColor,
-              onLongPress: submitData,
-              child: Text(
-                "Add Transactions",
-                textAlign: TextAlign.center,
+                  FlatButton(
+                    child: Text(
+                      "Choose a date",
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: _pickDate,
+                  )
+                ],
               ),
-              textColor: Colors.white,
-              onPressed: () {},
-            )
-          ],
+              RaisedButton(
+                color: Theme.of(context).accentColor,
+                onLongPress: submitData,
+                child: Text(
+                  "Add Transactions",
+                  textAlign: TextAlign.center,
+                ),
+                textColor: Colors.white,
+                onPressed: () {},
+              )
+            ],
+          ),
         ),
       ),
     );
